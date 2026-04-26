@@ -23,21 +23,28 @@ const router = createRouter({
         },
         {
           path: 'knowledge',
-          name: 'LearningPath',
           component: () => import('@/views/LearningPath/index.vue'),
-          meta: { title: '学习目录' },
-        },
-        {
-          path: 'knowledge/:module',
-          name: 'KnowledgeModule',
-          component: () => import('@/views/KnowledgeDetail/index.vue'),
-          meta: { title: '知识模块' },
-        },
-        {
-          path: 'knowledge/:module/:id',
-          name: 'KnowledgeDetail',
-          component: () => import('@/views/KnowledgeDetail/index.vue'),
-          meta: { title: '知识点详情' },
+          redirect: '/knowledge/welcome',
+          children: [
+            {
+              path: 'welcome',
+              name: 'KnowledgeWelcome',
+              component: () => import('@/views/KnowledgeDetail/index.vue'),
+              meta: { title: '学习目录' },
+            },
+            {
+              path: ':module',
+              name: 'KnowledgeModule',
+              component: () => import('@/views/KnowledgeDetail/index.vue'),
+              meta: { title: '知识模块' },
+            },
+            {
+              path: ':module/:id',
+              name: 'KnowledgeDetail',
+              component: () => import('@/views/KnowledgeDetail/index.vue'),
+              meta: { title: '知识点详情' },
+            },
+          ],
         },
         {
           path: 'playground',
