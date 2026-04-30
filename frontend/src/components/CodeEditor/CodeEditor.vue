@@ -19,7 +19,7 @@ defineProps({
 defineEmits(['update:modelValue'])
 
 const editorOptions = {
-  theme: 'vs-dark',
+  theme: 'vs',
   fontSize: 14,
   minimap: { enabled: false },
   scrollBeyondLastLine: false,

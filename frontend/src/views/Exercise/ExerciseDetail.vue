@@ -128,7 +128,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import CodeEditor from '@/components/CodeEditor/CodeEditor.vue'
-import { runCode, submitCode } from '@/api/code'
+import { runCode, submitCode } from '@/api/modules/code'
 
 const DEFAULT_TEMPLATES = {
   'c++': '#include<bits/stdc++.h>\nusing namespace std;\nint main(){\n    // 在此编写代码\n    \n    return 0;\n}',
@@ -221,36 +221,69 @@ async function onSubmit() {
 <style scoped>
 .exercise-detail {
   display: flex;
-  height: 100vh;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  height: 100%;
+  background: #f0f2f5;
+  color: #1f2329;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   overflow: hidden;
+  gap: 8px;
+  padding: 8px;
 }
 
 .problem-panel {
   width: 45%;
   min-width: 320px;
-  border-right: 1px solid #3c3c3c;
+  border-radius: 8px;
   overflow-y: auto;
-  background: #252526;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.problem-panel :deep(.el-tabs__header) {
+  padding: 0 16px;
+  margin-bottom: 0;
+}
+
+.problem-panel :deep(.el-tabs__header) {
+  padding: 0 16px;
+  margin-bottom: 0;
 }
 
 .problem-content {
-  padding: 20px;
-  line-height: 1.7;
+  padding: 24px;
+  line-height: 1.8;
+  color: #1f2329;
 }
 
-.example-block { margin-top: 16px; }
+.problem-content h2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #1f2329;
+}
+
+.problem-content p {
+  color: #4e5969;
+  font-size: 14px;
+}
+
+.example-block { margin-top: 20px; }
+
+.example-block p strong {
+  color: #1f2329;
+  font-size: 14px;
+}
 
 .example-pre {
-  background: #1e1e1e;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  background: #f7f8fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
   padding: 10px 14px;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.7;
   margin: 6px 0;
+  color: #4e5969;
 }
 
 .editor-panel {
@@ -258,6 +291,7 @@ async function onSubmit() {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  gap: 8px;
 }
 
 .editor-toolbar {
@@ -265,27 +299,35 @@ async function onSubmit() {
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3c3c3c;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   flex-shrink: 0;
 }
 
 .editor-area {
   flex: 1;
   min-height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e4e7ed;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 .result-area {
   height: 240px;
-  border-top: 1px solid #3c3c3c;
-  background: #1e1e1e;
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
   overflow-y: auto;
   padding: 0 12px;
   flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
 .empty-hint {
-  color: #6c6c6c;
+  color: #c0c4cc;
   text-align: center;
   padding: 30px 0;
   font-size: 13px;
@@ -296,27 +338,29 @@ async function onSubmit() {
 
 .case-label {
   font-size: 12px;
-  color: #9cdcfe;
-  margin: 6px 0 2px;
+  color: #909399;
+  margin: 8px 0 4px;
+  font-weight: 500;
 }
 
 .case-pre {
-  background: #2d2d2d;
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  background: #f5f7fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
   padding: 8px 12px;
   font-size: 13px;
   margin: 0;
   white-space: pre-wrap;
+  color: #1f2329;
 }
 
 .error-pre {
-  background: #2d1515;
-  border: 1px solid #6e2020;
-  border-radius: 4px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
   padding: 8px 12px;
   font-size: 12px;
-  color: #f48771;
+  color: #cf1322;
   margin: 6px 0;
   white-space: pre-wrap;
 }
@@ -326,34 +370,36 @@ async function onSubmit() {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin: 8px 0;
   font-weight: 600;
   font-size: 15px;
 }
-.status-banner.accepted { background: #1a3a1a; color: #4ec94e; }
-.status-banner.wrong_answer { background: #3a1a1a; color: #f56c6c; }
-.status-banner.compile_error { background: #3a1a1a; color: #f56c6c; }
-.status-banner.runtime_error { background: #3a1a1a; color: #f56c6c; }
+.status-banner.accepted { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+.status-banner.wrong_answer { background: #fff2f0; color: #cf1322; border: 1px solid #ffccc7; }
+.status-banner.compile_error { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+.status-banner.runtime_error { background: #fff2f0; color: #cf1322; border: 1px solid #ffccc7; }
 
 .status-icon { font-size: 18px; }
-.pass-count { font-size: 13px; font-weight: 400; color: #9cdcfe; margin-left: auto; }
+.pass-count { font-size: 13px; font-weight: 400; color: #909399; margin-left: auto; }
 
 .test-results { margin-top: 8px; }
 
 .test-result-item {
-  border: 1px solid #3c3c3c;
-  border-radius: 4px;
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
   padding: 8px 12px;
   margin-bottom: 6px;
+  background: #fafafa;
 }
-.test-result-item.passed { border-color: #2d5a2d; }
-.test-result-item.failed { border-color: #5a2d2d; }
+.test-result-item.passed { border-color: #b7eb8f; background: #f6ffed; }
+.test-result-item.failed { border-color: #ffccc7; background: #fff2f0; }
 
 .tr-detail {
   margin-top: 6px;
   font-size: 13px;
   line-height: 1.8;
+  color: #4e5969;
 }
-.tr-label { color: #9cdcfe; }
+.tr-label { color: #909399; font-weight: 500; }
 </style>
