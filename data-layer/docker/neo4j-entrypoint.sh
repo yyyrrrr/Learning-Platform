@@ -27,7 +27,7 @@ if [ "$EXISTING_COUNT" != "0" ] && [ -n "$EXISTING_COUNT" ]; then
 else
     echo "开始自动导入数据..."
     echo ""
-    
+
     # 执行自动导入脚本
     if [ -f "/scripts/auto_import.sh" ]; then
         bash /scripts/auto_import.sh
