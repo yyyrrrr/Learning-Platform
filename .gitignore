@@ -48,3 +48,8 @@ spring-boot-*.log
 src/python/AIchat/config/apikeys.local.json
 
 .history/
+# Playwright MCP snapshots
+.playwright-mcp/
+
+# Playwright MCP snapshots
+.playwright-mcp/

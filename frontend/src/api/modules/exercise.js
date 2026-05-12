@@ -19,3 +19,9 @@ export function submitAnswer(data) {
 export function getWrongList() {
   return http.get('/exercise/wrong')
 }
+
+/** 获取单个习题详情 */
+export function getExerciseDetail(id) {
+    return http.get(`/exercise/${id}`)
+}
+
