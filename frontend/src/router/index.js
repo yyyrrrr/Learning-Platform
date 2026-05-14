@@ -65,6 +65,24 @@ const router = createRouter({
           meta: { title: '习题详情' },
         },
         {
+          path: '/exercise/choice/:id',
+          name: 'ChoiceExercise',
+          component: () => import('@/views/Exercise/ChoiceExercise.vue'),
+          meta: {
+            title: '选择题',
+            requiresAuth: true
+          }
+        },
+        {
+          path: '/exercise/fill/:id',
+          name: 'FillBlankExercise.vue',
+          component: () => import('@/views/Exercise/FillBlankExercise.vue'),
+          meta: {
+            title: '填空题',
+            requiresAuth: true
+          }
+        },
+        {
           path: 'statistics',
           name: 'Statistics',
           component: () => import('@/views/Statistics/index.vue'),
