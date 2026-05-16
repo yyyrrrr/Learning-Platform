@@ -108,7 +108,7 @@ const loading = ref(false)
 const videos = ref([])
 const selectedVideo = ref(null)
 const videoRef = ref(null)
-const pendingResumeProgress = ref(null)
+const pendingResumeSeconds = ref(null)
 const lastReportAt = ref(0)
 
 const filter = reactive({
@@ -148,12 +148,12 @@ const fetchVideoList = async () => {
 const selectVideo = async (video) => {
   selectedVideo.value = video
   resetWatchState()
-  pendingResumeProgress.value = null
+  pendingResumeSeconds.value = null
 
   try {
     const record = await getWatchRecord(video.id)
     applyWatchRecord(record)
-    pendingResumeProgress.value = watchState.watchProgress
+    pendingResumeSeconds.value = watchState.watchDuration
     await nextTick()
     handleLoadedMetadata()
   } catch (error) {
@@ -183,13 +183,13 @@ const applyWatchRecord = (record) => {
 
 const handleLoadedMetadata = () => {
   const player = videoRef.value
-  if (!player || pendingResumeProgress.value === null || pendingResumeProgress.value <= 0) return
+  if (!player || pendingResumeSeconds.value === null || pendingResumeSeconds.value <= 0) return
 
   const duration = Number.isFinite(player.duration) ? player.duration : selectedVideo.value?.duration
-  if (duration > 0 && pendingResumeProgress.value < 100) {
-    player.currentTime = Math.min(duration - 1, Math.floor((duration * pendingResumeProgress.value) / 100))
+  if (duration > 0 && watchState.watchProgress < 100) {
+    player.currentTime = Math.min(Math.max(0, duration - 0.2), pendingResumeSeconds.value)
   }
-  pendingResumeProgress.value = null
+  pendingResumeSeconds.value = null
 }
 
 const handleTimeUpdate = () => {
@@ -224,7 +224,7 @@ const syncLocalProgress = () => {
     ? player.duration
     : selectedVideo.value?.duration
 
-  watchState.watchDuration = Math.max(0, Math.floor(player.currentTime || 0))
+  watchState.watchDuration = Math.max(0, Math.round(player.currentTime || 0))
   if (duration > 0) {
     watchState.watchProgress = clampProgress(Math.floor((watchState.watchDuration / duration) * 100))
   }

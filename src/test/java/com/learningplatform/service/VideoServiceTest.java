@@ -113,6 +113,25 @@ class VideoServiceTest {
         assertEquals(1, response.getIsCompleted());
     }
 
+    @Test
+    void shouldNotDecreaseExistingWatchProgress() {
+        when(videoRepository.selectById(1L)).thenReturn(existingVideo());
+        VideoWatchRecord existingRecord = new VideoWatchRecord();
+        existingRecord.setId(3L);
+        existingRecord.setUserId(7L);
+        existingRecord.setVideoId(1L);
+        existingRecord.setWatchProgress(80);
+        existingRecord.setWatchDuration(8);
+        existingRecord.setIsCompleted(0);
+        when(videoWatchRecordRepository.selectOne(any())).thenReturn(existingRecord);
+
+        VideoWatchRecordResponse response = videoService.saveWatchRecord(7L, watchRequest(1L, 70, 7));
+
+        assertEquals(80, response.getWatchProgress());
+        assertEquals(8, response.getWatchDuration());
+        verify(videoWatchRecordRepository).updateById(existingRecord);
+    }
+
     private Video existingVideo() {
         Video video = new Video();
         video.setId(1L);

@@ -94,9 +94,12 @@ public class VideoService {
     }
 
     private void fillWatchRecord(VideoWatchRecord record, VideoWatchRecordRequest request) {
-        Integer progress = request.getWatchProgress();
+        Integer progress = Math.max(record.getWatchProgress() == null ? 0 : record.getWatchProgress(),
+                request.getWatchProgress());
+        Integer duration = Math.max(record.getWatchDuration() == null ? 0 : record.getWatchDuration(),
+                request.getWatchDuration() == null ? 0 : request.getWatchDuration());
         record.setWatchProgress(progress);
-        record.setWatchDuration(request.getWatchDuration() == null ? 0 : request.getWatchDuration());
+        record.setWatchDuration(duration);
         record.setLastWatchTime(LocalDateTime.now());
         record.setIsCompleted(progress >= COMPLETED_PROGRESS_THRESHOLD ? 1 : 0);
     }
