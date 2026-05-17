@@ -29,18 +29,31 @@ public class KnowledgePointService extends ServiceImpl<KnowledgePointRepository,
         }
 
         List<Map<String, Object>> relatedNodes = graphService.getRelatedNodes(kp.getNeo4jId());
+        if (relatedNodes.isEmpty()) {
+            Map<String, Object> result = new HashMap<>();
+            result.put("prerequisites", Collections.emptyList());
+            return result;
+        }
+
+        List<String> neo4jIds = relatedNodes.stream()
+                .map(node -> (String) node.get("neo4jId"))
+                .collect(Collectors.toList());
+
+        List<KnowledgePoint> prereqKps = lambdaQuery()
+                .in(KnowledgePoint::getNeo4jId, neo4jIds)
+                .list();
+
+        Map<String, Long> neo4jIdToPrimaryKey = prereqKps.stream()
+                .filter(p -> p.getNeo4jId() != null)
+                .collect(Collectors.toMap(KnowledgePoint::getNeo4jId, KnowledgePoint::getId, (a, b) -> a));
 
         List<Map<String, Object>> prerequisites = new ArrayList<>();
         for (Map<String, Object> node : relatedNodes) {
             String neo4jId = (String) node.get("neo4jId");
-            KnowledgePoint prereqKp = lambdaQuery()
-                    .eq(KnowledgePoint::getNeo4jId, neo4jId)
-                    .one();
-
             Map<String, Object> prereq = new HashMap<>();
             prereq.put("neo4jId", neo4jId);
             prereq.put("name", node.get("name"));
-            prereq.put("id", prereqKp != null ? prereqKp.getId() : null);
+            prereq.put("id", neo4jIdToPrimaryKey.get(neo4jId));
             prerequisites.add(prereq);
         }
 
