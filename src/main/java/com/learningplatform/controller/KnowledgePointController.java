@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/knowledge", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
@@ -61,5 +62,11 @@ public class KnowledgePointController {
     public Result<List<CodeExample>> getCodes(@PathVariable Long knowledgeId) {
         List<CodeExample> codes = codeExampleService.listByKnowledgePointId(knowledgeId);
         return Result.success(codes);
+    }
+
+    @GetMapping("/{id}/prerequisites")
+    public Result<Map<String, Object>> getPrerequisites(@PathVariable Long id) {
+        Map<String, Object> prerequisites = knowledgePointService.getPrerequisites(id);
+        return Result.success(prerequisites);
     }
 }

@@ -158,6 +158,62 @@ public class GraphService {
                 .all());
     }
 
+    /**
+     * 获取单个知识点的前置依赖节点（RELATED_TO 关系指向的节点）
+     */
+    public List<Map<String, Object>> getRelatedNodes(String neo4jId) {
+        return toTypedList(neo4jClient.query(
+                "MATCH (n:KnowledgePoint {neo4j_id: $id})-[r:RELATED_TO]->(m:KnowledgePoint) " +
+                        "RETURN m.neo4j_id AS neo4jId, m.name AS name, r.reason AS reason"
+        )
+                .bind(neo4jId).to("id")
+                .fetchAs(Map.class)
+                .mappedBy((typeSystem, record) -> {
+                    Map<String, Object> node = new HashMap<>();
+                    node.put("neo4jId", getValue(record, "neo4jId"));
+                    node.put("name", getValue(record, "name"));
+                    String reason = getValue(record, "reason");
+                    if (reason != null) {
+                        node.put("reason", reason);
+                    }
+                    return node;
+                })
+                .all());
+    }
+
+    /**
+     * 批量获取多个知识点的前置依赖（用于树节点批量填充）
+     * 返回 Map<源节点neo4jId, List<目标节点neo4jId>>
+     */
+    public Map<String, List<String>> batchGetRelatedNodeIds(List<String> neo4jIds) {
+        if (neo4jIds == null || neo4jIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        List<Map<String, Object>> rows = toTypedList(neo4jClient.query(
+                "MATCH (n:KnowledgePoint)-[r:RELATED_TO]->(m:KnowledgePoint) " +
+                        "WHERE n.neo4j_id IN $ids " +
+                        "RETURN n.neo4j_id AS sourceId, m.neo4j_id AS targetId"
+        )
+                .bind(neo4jIds).to("ids")
+                .fetchAs(Map.class)
+                .mappedBy((typeSystem, record) -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("sourceId", getValue(record, "sourceId"));
+                    row.put("targetId", getValue(record, "targetId"));
+                    return row;
+                })
+                .all());
+
+        Map<String, List<String>> result = new HashMap<>();
+        for (Map<String, Object> row : rows) {
+            String sourceId = (String) row.get("sourceId");
+            String targetId = (String) row.get("targetId");
+            result.computeIfAbsent(sourceId, k -> new ArrayList<>()).add(targetId);
+        }
+        return result;
+    }
+
     private static String getValue(org.neo4j.driver.Record record, String key) {
         var val = record.get(key);
         return val == null || val.isNull() ? null : val.asString();

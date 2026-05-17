@@ -103,6 +103,7 @@ import { Search, InfoFilled, DArrowLeft, DArrowRight } from '@element-plus/icons
 import { useKnowledgeStore } from '@/stores/knowledge'
 import { useLearningStore } from '@/stores/learning'
 import { getKnowledgeTree } from '@/api/modules/knowledge'
+import { getProgress } from '@/api/modules/learning'
 
 const router = useRouter()
 const knowledgeStore = useKnowledgeStore()
@@ -205,6 +206,15 @@ onMounted(async () => {
     treeData.value = data || []
   } catch {
     // 加载失败时保持空数组，树组件显示空状态
+  }
+
+  try {
+    const res = await getProgress()
+    if (res && res.progressMap) {
+      learningStore.loadProgressMap(res.progressMap)
+    }
+  } catch {
+    // 进度加载失败不影响目录树展示
   }
 })
 

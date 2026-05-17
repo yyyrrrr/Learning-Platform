@@ -24,3 +24,8 @@ export function getKnowledgeContents(knowledgeId) {
 export function getCodeExamples(knowledgeId) {
   return http.get(`/knowledge/${knowledgeId}/codes`)
 }
+
+/** 获取知识点的前置依赖 */
+export function getPrerequisites(id) {
+  return http.get(`/knowledge/${id}/prerequisites`)
+}
