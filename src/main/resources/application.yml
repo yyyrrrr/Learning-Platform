@@ -1,4 +1,5 @@
 server:
+  address: "::1"
   port: 8080
   servlet:
     context-path: /api
@@ -23,6 +24,16 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+      force-response: true
+
+  jackson:
+    default-property-inclusion: non_null
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
 
 mybatis-plus:
   type-aliases-package: com.learningplatform.entity
